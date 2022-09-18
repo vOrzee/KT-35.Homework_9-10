@@ -47,9 +47,12 @@ object ChatService {
         } else false
 
     fun removeChat(chatId: Int): Boolean =
-        storageChats.remove(storageChats.find { it.chatId == chatId })
+        storageChats.removeByChatId(chatId)
 
     fun clear() {
         storageChats = mutableSetOf()
     }
 }
+
+fun MutableSet<Chat>.removeByChatId(chatId: Int): Boolean =
+    this.remove(this.find { chatId == it.chatId })

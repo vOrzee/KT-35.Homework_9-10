@@ -66,8 +66,12 @@ class ChatServiceTest {
 
     @Test
     fun createChat() {
+        assertTrue(ChatService.createChat(499,"Какое-то сообщение"))
     }
-
+    @Test
+    fun createChatFailed() {
+        assertFalse(ChatService.createChat(500,"Какое-то сообщение"))
+    }
     @Test
     fun removeChat() {
         assertTrue(ChatService.removeChat(500))

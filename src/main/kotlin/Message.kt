@@ -3,6 +3,7 @@ class Message(var text: String) : DateStamp {
     override val date: Int
     private val fromId:Int
     var itsRead: Boolean = false
+    var isDeleted:Boolean = false
 
     init {
         Enumerator.countMessage += 1

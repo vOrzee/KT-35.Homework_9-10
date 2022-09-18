@@ -18,7 +18,7 @@ object ChatService {
 
     fun getChat(chatId: Int, count: Int = 100, beginId: Int? = null): List<Message> =
         storageChats.find { it.chatId == chatId }
-            ?.messages?.filter { if (beginId != null) it.id <= beginId else true }
+            ?.messages?.filter { if (beginId != null) it.id >= beginId else true }
             ?.filterIndexed { index, _ -> index < count }
             ?.onEach { it.itsRead = true } ?: emptyList()
 
@@ -29,16 +29,15 @@ object ChatService {
     }
 
     fun deleteMessage(messageId: Int): Boolean {
-        var count:Int = 0
+        var count: Int = 0
         storageChats.forEach { chat ->
             if (chat.messages.any { it.id == messageId })
                 count++
         }
         storageChats.forEach { chat ->
-            chat.messages.find { it.id == messageId }
-                ?.isDeleted = true
+            chat.messages.remove(chat.messages.find { it.id == messageId })
         }
-        return count!=0
+        return count != 0
     }
 
     fun createChat(fromId: Int, text: String): Boolean =

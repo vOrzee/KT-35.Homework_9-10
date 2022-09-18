@@ -70,5 +70,11 @@ class ChatServiceTest {
 
     @Test
     fun removeChat() {
+        assertTrue(ChatService.removeChat(500))
+    }
+
+    @Test
+    fun removeChatFailed() {
+        assertFalse(ChatService.removeChat(459))
     }
 }

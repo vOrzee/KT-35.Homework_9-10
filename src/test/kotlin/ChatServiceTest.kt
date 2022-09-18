@@ -62,6 +62,12 @@ class ChatServiceTest {
 
     @Test
     fun deleteMessage() {
+        assertTrue(ChatService.deleteMessage(3))
+    }
+
+    @Test
+    fun deleteMessageFailed() {
+        assertTrue(ChatService.deleteMessage(9))
     }
 
     @Test

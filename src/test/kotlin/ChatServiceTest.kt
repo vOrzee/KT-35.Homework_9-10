@@ -25,6 +25,7 @@ class ChatServiceTest {
         myUserId = 500
         ChatService.createChat(385, "Первое сообщение для 385")
         ChatService.createMessage(734, "Второе сообщение для 734")
+        myUserId = 734
     }
 
     @After
@@ -47,8 +48,10 @@ class ChatServiceTest {
 
     @Test
     fun getUnreadChatCount() {
+        println(ChatService.getChats())
         assertEquals(3, ChatService.getUnreadChatCount())
     }
+
     @Test
     fun getUnreadChatCountFailed() {
         val unreadCountBefore = ChatService.getUnreadChatCount()
@@ -59,15 +62,21 @@ class ChatServiceTest {
 
     @Test
     fun getChats() {
-        assertEquals("Пятое сообщение для 500",
-            ChatService.getChats()[500])
+        assertEquals(
+            "Второе сообщение для 734",
+            ChatService.getChats()[setOf(myUserId, 500)]
+        )
     }
+
     @Test
     fun getChatsEmpty() {
-        ChatService.deleteMessage(6)
-        assertEquals("Сообщений не обнаружено",
-            ChatService.getChats()[385])
+        ChatService.deleteMessage(4)
+        assertEquals(
+            "Сообщений не обнаружено",
+            ChatService.getChats()[setOf(myUserId, 385)]
+        )
     }
+
     @Test
     fun getChat() {
         assertEquals(2, ChatService.getChat(500, 2).size)
@@ -81,11 +90,6 @@ class ChatServiceTest {
     @Test
     fun createMessage() {
         assertTrue(ChatService.createMessage(500, "Что-то там"))
-    }
-
-    @Test(expected = NotFoundException::class)
-    fun createMessageFailed() {
-        assertFalse(ChatService.createMessage(400, "Что-то там"))
     }
 
     @Test

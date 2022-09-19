@@ -14,6 +14,6 @@ class MessageTest {
     @Test
     fun testToString() {
         val message = Message("Первое сообщение")
-        assertEquals(60, message.toString().length)
+        assertEquals(64, message.toString().length)
     }
 }

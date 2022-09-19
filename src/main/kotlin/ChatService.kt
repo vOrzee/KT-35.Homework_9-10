@@ -1,5 +1,3 @@
-import java.io.Serializable
-
 object ChatService {
     var storageChats = mutableSetOf<Chat>()
 
@@ -7,8 +5,8 @@ object ChatService {
         chat.messages.any { !it.itsRead }
     }.size
 
-    fun getChats(): Map<Int, String> {
-        val result = mutableMapOf<Int, String>()
+    fun getChats(): Map<Set<Int>, String> {
+        val result = mutableMapOf<Set<Int>, String>()
         storageChats.forEach {
             result += if (it.messages.isEmpty()) it.chatId to "Сообщений не обнаружено"
             else it.chatId to it.messages.last().text
@@ -16,20 +14,22 @@ object ChatService {
         return result
     }
 
-    fun getChat(chatId: Int, count: Int = 100, beginId: Int? = null): List<Message> =
-        storageChats.find { it.chatId == chatId }
+    fun getChat(withId: Int, count: Int = 100, beginId: Int? = null): List<Message> =
+        storageChats.find { it.chatId == sortedSetOf(withId, myUserId) }
             ?.messages?.filter { if (beginId != null) it.id >= beginId else true }
             ?.filterIndexed { index, _ -> index < count }
             ?.onEach { it.itsRead = true } ?: emptyList()
 
-    fun createMessage(chatId: Int, text: String): Boolean {
-        storageChats.find { it.chatId == chatId }?.messages?.add(Message(text))
-            ?: throw NotFoundException()
+    fun createMessage(withId: Int, text: String): Boolean {
+        storageChats.find { it.chatId == sortedSetOf(withId, myUserId) }?.messages?.add(Message(text).also {
+            it.toId = withId
+        })
+            ?: createChat(withId, text)
         return true
     }
 
     fun deleteMessage(messageId: Int): Boolean {
-        var count: Int = 0
+        var count = 0
         storageChats.forEach { chat ->
             if (chat.messages.any { it.id == messageId })
                 count++
@@ -40,19 +40,19 @@ object ChatService {
         return count != 0
     }
 
-    fun createChat(fromId: Int, text: String): Boolean =
-        if (storageChats.find { it.chatId == fromId } == null) {
-            storageChats.add(Chat(fromId, mutableListOf(Message(text))))
+    fun createChat(withId: Int, text: String): Boolean =
+        if (storageChats.find { it.chatId == sortedSetOf(withId, myUserId) } == null) {
+            storageChats.add(Chat(withId, mutableListOf(Message(text).also { it.toId = withId })))
             true
         } else false
 
-    fun removeChat(chatId: Int): Boolean =
-        storageChats.removeByChatId(chatId)
+    fun removeChat(withId: Int): Boolean =
+        storageChats.removeByChatId(withId)
 
     fun clear() {
         storageChats = mutableSetOf()
     }
 }
 
-fun MutableSet<Chat>.removeByChatId(chatId: Int): Boolean =
-    this.remove(this.find { chatId == it.chatId })
+fun MutableSet<Chat>.removeByChatId(withId: Int): Boolean =
+    this.remove(this.find { sortedSetOf(withId, myUserId) == it.chatId })

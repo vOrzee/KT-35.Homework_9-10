@@ -1,5 +1,4 @@
 import org.junit.Test
-
 import org.junit.Assert.*
 
 class ChatTest {
@@ -10,8 +9,14 @@ class ChatTest {
         val chat2 = Chat(86, mutableListOf(Message("AC")))
         val chat3 = Chat(88, mutableListOf(Message("AC")))
         val message = Message("TEXT")
-        assertTrue(chat1==chat2)
+        assertTrue(chat1 == chat2)
         assertTrue(chat2 != chat3 && chat1 != chat3)
         assertTrue(!chat2.equals(message))
+    }
+
+    @Test
+    fun testToString() {
+        val chat1 = Chat(86, mutableListOf(Message("ABC")))
+        assertTrue(chat1.toString().length == 76)
     }
 }

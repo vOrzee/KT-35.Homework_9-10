@@ -1,13 +1,13 @@
 object ChatService {
-    var storageChats = mutableSetOf<Chat>()
+    var storageChats = emptySequence<Chat>()
 
     fun getUnreadChatCount() = storageChats.filter { chat ->
         chat.messages.any { !it.itsRead }
-    }.size
+    }.count()
 
     fun getChats(): Map<Set<Int>, String> {
         val result = mutableMapOf<Set<Int>, String>()
-        storageChats.forEach {
+        storageChats.toSet().forEach {
             result += if (it.messages.isEmpty()) it.chatId to "Сообщений не обнаружено"
             else it.chatId to it.messages.last().text
         }
@@ -43,17 +43,22 @@ object ChatService {
 
     fun createChat(withId: Int, text: String): Boolean =
         if (storageChats.find { it.chatId == sortedSetOf(withId, myUserId) } == null) {
-            storageChats.add(Chat(withId, mutableListOf(Message(text).also { it.toId = withId })))
+            storageChats += Chat(withId, mutableListOf(Message(text).also { it.toId = withId }))
             true
         } else false
 
-    fun removeChat(withId: Int): Boolean =
-        storageChats.removeByChatId(withId)
+    fun removeChat(withId: Int): Boolean {
+        val beforeCount = storageChats.count()
+        storageChats = storageChats.removeByChatId(withId)
+        return beforeCount != storageChats.count()
+    }
 
     fun clear() {
-        storageChats = mutableSetOf()
+        storageChats = emptySequence()
     }
 }
 
-fun MutableSet<Chat>.removeByChatId(withId: Int): Boolean =
-    this.remove(this.find { sortedSetOf(withId, myUserId) == it.chatId })
+fun Sequence<Chat>.removeByChatId(withId: Int): Sequence<Chat> {
+    return if (this.find { sortedSetOf(withId, myUserId) == it.chatId } == null) this
+    else this.minus(this.find { sortedSetOf(withId, myUserId) == it.chatId }).filterNotNull()
+}

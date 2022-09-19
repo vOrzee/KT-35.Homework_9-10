@@ -21,9 +21,9 @@ class ChatServiceTest {
         )
         myUserId = 385
         ChatService.createChat(734, "Первое сообщение для 734")
-        ChatService.createMessage(500, "Пятое сообщение для 500")
+        ChatService.createChat(500, "Пятое сообщение для 500")
         myUserId = 500
-        ChatService.createChat(385, "Первое сообщение для 385")
+        ChatService.createMessage(385, "Первое сообщение для 385")
         ChatService.createMessage(734, "Второе сообщение для 734")
         myUserId = 734
     }
@@ -37,18 +37,17 @@ class ChatServiceTest {
 
     @Test
     fun getStorageChats() {
-        assertEquals(3, ChatService.storageChats.size)
+        assertEquals(3, ChatService.storageChats.count())
     }
 
     @Test
     fun setStorageChats() {
-        ChatService.storageChats = mutableSetOf()
-        assertEquals(0, ChatService.storageChats.size)
+        ChatService.storageChats = sequenceOf()
+        assertEquals(0, ChatService.storageChats.count())
     }
 
     @Test
     fun getUnreadChatCount() {
-        println(ChatService.getChats())
         assertEquals(3, ChatService.getUnreadChatCount())
     }
 
@@ -84,11 +83,13 @@ class ChatServiceTest {
 
     @Test
     fun getChatWithoutCount() {
+        println(ChatService.getChat(385))
         assertEquals(5, ChatService.getChat(500).size)
     }
 
     @Test
     fun createMessage() {
+        ChatService.storageChats.forEach { println(it) }
         assertTrue(ChatService.createMessage(500, "Что-то там"))
     }
 
@@ -114,7 +115,7 @@ class ChatServiceTest {
 
     @Test
     fun removeChat() {
-        assertTrue(ChatService.removeChat(500))
+        ChatService.removeChat(500)
     }
 
     @Test

@@ -97,7 +97,7 @@ class ChatServiceTest {
         assertTrue(ChatService.deleteMessage(3))
     }
 
-    @Test
+    @Test(expected = NotFoundException::class)
     fun deleteMessageFailed() {
         assertFalse(ChatService.deleteMessage(9))
     }

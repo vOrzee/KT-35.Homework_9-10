@@ -38,8 +38,7 @@ object ChatService {
                 chat - chat.messages.find { it.id == messageId }
             }
             true
-        }
-        else false
+        } else false
     }
 
     fun createChat(withId: Int, text: String): Boolean =

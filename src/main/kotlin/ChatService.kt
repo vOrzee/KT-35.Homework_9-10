@@ -21,10 +21,9 @@ object ChatService {
             ?.onEach { it.itsRead = true } ?: emptyList()
 
     fun createMessage(withId: Int, text: String): Boolean {
-        storageChats.find { it.chatId == sortedSetOf(withId, myUserId) }?.messages?.add(Message(text).also {
+        storageChats.find { it.chatId == sortedSetOf(withId, myUserId) }?.plus((Message(text).also {
             it.toId = withId
-        })
-            ?: createChat(withId, text)
+        })) ?: createChat(withId, text)
         return true
     }
 
@@ -34,10 +33,13 @@ object ChatService {
             if (chat.messages.any { it.id == messageId })
                 count++
         }
-        storageChats.forEach { chat ->
-            chat.messages.remove(chat.messages.find { it.id == messageId })
+        return if (count == 1) {
+            storageChats.forEach { chat ->
+                chat - chat.messages.find { it.id == messageId }
+            }
+            true
         }
-        return count != 0
+        else false
     }
 
     fun createChat(withId: Int, text: String): Boolean =

@@ -14,4 +14,7 @@ data class Chat(val withId: Int, var messages: MutableList<Message>) {
         if (chatId.size != 2) return "Chat not created"
         return "${chatId.elementAt(0)} < = > ${chatId.elementAt(1)} messages:\n$messages"
     }
+
+    operator fun plus(message:Message?) = if(message!=null) this.messages.add(message) else false
+    operator fun minus(message:Message?) = if(message!=null) this.messages.remove(message) else false
 }
